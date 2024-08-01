@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image to PDF Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Image to PDF Converter</h1>
+        <form action="/" method="post" enctype="multipart/form-data" id="upload-form">
+            <div class="file-input">
+                <label for="file">Choose Images</label>
+                <input type="file" name="file" id="file" multiple required>
+            </div>
+            <div id="preview"></div>
+            <div class="filename-input">
+                <label for="output_filename">Output PDF Filename:</label>
+                <input type="text" name="output_filename" id="output_filename" required>
+            </div>
+            <button type="submit">Convert to PDF</button>
+        </form>
+        <div id="success-message" class="hidden">
+            <p id="message"></p>
+            <button onclick="closeMessage()">Close</button>
+        </div>
+    </div>
+    <script>
+        document.getElementById('file').addEventListener('change', function() {
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '';
+            const files = this.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-image');
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('upload-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.blob())
+              .then(blob => {
+                const outputFilename = document.getElementById('output_filename').value;
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `${outputFilename}.pdf`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showMessage(`${outputFilename}.pdf downloaded successfully.`);
+            });
+        });
+
+        function showMessage(message) {
+            const messageBox = document.getElementById('success-message');
+            const messageText = document.getElementById('message');
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        function closeMessage() {
+            const messageBox = document.getElementById('success-message');
+            messageBox.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
