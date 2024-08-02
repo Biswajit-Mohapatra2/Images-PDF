@@ -1,4 +1,4 @@
 from app import app
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=443)  # Change the port number as needed
+    app.run(host="0.0.0.0", port=8000)  # Change the port number as needed
