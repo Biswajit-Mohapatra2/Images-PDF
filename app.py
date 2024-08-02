@@ -42,6 +42,3 @@ def index():
             images_to_pdf(images, output_pdf_path)
             return send_file(output_pdf_path, as_attachment=True)
     return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
